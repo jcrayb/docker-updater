@@ -7,6 +7,9 @@ app = Flask(__name__)
 
 def pull_and_restart(image):
     config = json.load(open("config/test.json", 'r'))
+    if not image in config['images']:
+        return {'content':'', 'status':'ERR', 'error':'Image not allowed'}
+    
     main_dir = config['main_dir']
     image_dir = config['images'][image]
     dir_ = os.path.join(main_dir, image_dir)
@@ -20,7 +23,6 @@ def pull_and_restart(image):
 @app.route('/ping', methods=['POST'])
 def ping():
     image = request.json['image']
-    print(str(image))
     data = pull_and_restart(image)
     return data
 
