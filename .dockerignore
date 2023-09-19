@@ -1,0 +1,4 @@
+test.py
+.gitignore
+.gitattributes
+**/__pycache__

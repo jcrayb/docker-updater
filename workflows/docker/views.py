@@ -11,7 +11,7 @@ container_handler = ContainerHandler()
 def healthcheck():
     return {'status':'healthy'}
 
-@docker.route('/pull', methods=['GET'])
+@docker.route('/pull', methods=['POST'])
 def post_pull():
     try:
         image = request.args['image']
@@ -35,7 +35,7 @@ def post_pull():
     data = requests.post(f"{container_handler.protocol}{container_handler.host}:{container_handler.port}/pull?image={image}&restart={restart}&auth_key={auth_key}").json()
     return data
 
-@docker.route('/restart', methods=['GET'])
+@docker.route('/restart', methods=['POST'])
 def post_restart():
     try:
         image = request.args['image']
@@ -51,5 +51,4 @@ def post_restart():
         return {'content':'', 'status':'ERR', 'error':'Authentication failed.'}
     
     data = requests.post(f"{container_handler.protocol}{container_handler.host}:{container_handler.port}/restart?image={image}&auth_key={auth_key}").json()
-    print(f"{container_handler.protocol}{container_handler.host}:{container_handler.port}/restart?image={image}&auth_key={auth_key}")
     return data
