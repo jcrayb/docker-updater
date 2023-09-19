@@ -2,3 +2,5 @@ test.py
 .gitignore
 .gitattributes
 **/__pycache__
+container_manager.py
+test.py
