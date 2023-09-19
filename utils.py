@@ -1,4 +1,10 @@
 import json
+import os
+
+cwd = os.getcwd()
+
+def from_root(path):
+    return os.path.join(cwd, path)
 
 class ContainerHandler():
     def __init__(self) -> None:
@@ -11,3 +17,4 @@ def verify_user(key):
     if key == open('config/key', 'r').read():
         return True
     return False
+
