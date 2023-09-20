@@ -1,11 +1,9 @@
-from flask import Flask, request
 import json
 import os
 import subprocess
+from utils import from_root
 
-app = Flask(__name__)
-
-config = json.load(open("config/config.json", 'r'))
+config = json.load(open(from_root("config/config.json"), 'r'))
 docker_dir = config['docker_dir']
 
 def pull_image(image):
@@ -32,28 +30,3 @@ def restart_container(image):
 
     run = subprocess.run(command, capture_output=True, shell=True)
     return {"content":image, 'status':'OK', 'error': 'None'}
-
-@app.route('/pull', methods=['POST'])
-def post_pull():
-    data = {}
-    image = request.args['image']
-    data['pull'] = pull_image(image)
-    if request.args['restart'] == 'True':
-        data['restart'] = restart_container(image)
-    return data
-
-@app.route('/restart', methods=['POST'])
-def post_restart():
-    data = {}
-    image = request.args['image']
-    data['restart'] = restart_container(image)
-    return data
-
-@app.route('/healthcheck')
-def healthcheck():
-    return {'status':'healthy'}
-
-if __name__ == '__main__':
-    if not os.path.exists('config'):
-        os.mkdir('config')
-    app.run(host="0.0.0.0", port = '7000', debug=True)

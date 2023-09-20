@@ -1,6 +1,6 @@
 from flask import Blueprint, request, url_for
 from utils import verify_user, ContainerHandler, cwd
-import requests
+from container_manager import restart_container, pull_image
 
 
 docker = Blueprint('docker', __name__, url_prefix='/docker')
@@ -14,6 +14,14 @@ def healthcheck():
 @docker.route('/pull', methods=['POST'])
 def post_pull():
     try:
+        auth_key = request.args['auth_key']
+    except KeyError:
+        return {'content':'', 'status':'ERR', 'error':'Authentication key not provided.'}
+    
+    if not verify_user(auth_key):
+        return {'content':auth_key, 'status':'ERR', 'error':'Authentication failed.'}
+    
+    try:
         image = request.args['image']
     except KeyError:
         return {'content':'', 'status':'ERR', 'error':'Image name not provided.'}
@@ -23,26 +31,17 @@ def post_pull():
     except KeyError:
         restart = False
     
-    try:
-        auth_key = request.args['auth_key']
-    except KeyError:
-        return {'content':'', 'status':'ERR', 'error':'Authentication key not provided.'}
     
-    if not verify_user(auth_key):
-        return {'content':auth_key, 'status':'ERR', 'error':'Authentication failed.'}
+    data = {}
     
-    
-    data = requests.post(f"{container_handler.protocol}{container_handler.host}:{container_handler.port}/pull?image={image}&restart={restart}&auth_key={auth_key}").json()
+    data['pull'] = pull_image(image)
+    if restart:
+        data['restart'] = restart_container(image)
     return data
 
 @docker.route('/restart', methods=['POST'])
 def post_restart():
     try:
-        image = request.args['image']
-    except KeyError:
-        return {'content':'', 'status':'ERR', 'error':'Image name not provided.'}
-    
-    try:
         auth_key = request.args['auth_key']
     except KeyError:
         return {'content':'', 'status':'ERR', 'error':'Authentication key not provided.'}
@@ -50,5 +49,12 @@ def post_restart():
     if not verify_user(auth_key):
         return {'content':auth_key, 'status':'ERR', 'error':'Authentication failed.'}
     
-    data = requests.post(f"{container_handler.protocol}{container_handler.host}:{container_handler.port}/restart?image={image}&auth_key={auth_key}").json()
+    try:
+        image = request.args['image']
+    except KeyError:
+        return {'content':'', 'status':'ERR', 'error':'Image name not provided.'}
+    
+    data = {}
+
+    data['restart'] = restart_container(image)
     return data
