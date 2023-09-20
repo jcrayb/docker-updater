@@ -1,11 +1,8 @@
 from flask import Blueprint, request, url_for
-from utils import verify_user, ContainerHandler, cwd
+from utils import verify_user, cwd
 from container_manager import restart_container, pull_image
 
-
 docker = Blueprint('docker', __name__, url_prefix='/docker')
-
-container_handler = ContainerHandler()
 
 @docker.route('/healthcheck')
 def healthcheck():
