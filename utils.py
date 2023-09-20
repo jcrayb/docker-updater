@@ -14,7 +14,7 @@ class ContainerHandler():
         self.port = json_data['port']
 
 def verify_user(key):
-    if key == open('config/key', 'r').read():
+    if key == open(from_root('config/key'), 'r').read():
         return True
     return False
 

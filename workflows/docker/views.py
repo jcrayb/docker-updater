@@ -29,7 +29,7 @@ def post_pull():
         return {'content':'', 'status':'ERR', 'error':'Authentication key not provided.'}
     
     if not verify_user(auth_key):
-        return {'content':'', 'status':'ERR', 'error':'Authentication failed.'}
+        return {'content':auth_key, 'status':'ERR', 'error':'Authentication failed.'}
     
     
     data = requests.post(f"{container_handler.protocol}{container_handler.host}:{container_handler.port}/pull?image={image}&restart={restart}&auth_key={auth_key}").json()
@@ -48,7 +48,7 @@ def post_restart():
         return {'content':'', 'status':'ERR', 'error':'Authentication key not provided.'}
     
     if not verify_user(auth_key):
-        return {'content':'', 'status':'ERR', 'error':'Authentication failed.'}
+        return {'content':auth_key, 'status':'ERR', 'error':'Authentication failed.'}
     
     data = requests.post(f"{container_handler.protocol}{container_handler.host}:{container_handler.port}/restart?image={image}&auth_key={auth_key}").json()
     return data
